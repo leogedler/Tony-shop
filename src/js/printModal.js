@@ -1,6 +1,7 @@
 import { list_products } from "../../utils/data.js";
 import { modal } from "./node.js";
-import { templateItem } from "./printItemInCart.js";
+import { templateCartItem } from "./printItemInCart.js";
+import { list_item, go_to_pay_button } from "./node.js";
 
 const templateModal = (itemSelect) => {
 	const { name, img, price, description, id } = itemSelect;
@@ -67,36 +68,53 @@ export const viewModal = (id) => {
 	modal.style.clipPath = "circle(70.7% at 50% 50%)";
 };
 
-let arrayOfItems = new Array();
 
-export const addingItem = (id) => {
+const savedCartItems = localStorage.getItem("element_cart");
+const arrayOfItems = savedCartItems ? JSON.parse(savedCartItems) : [];
+
+export const addingItem = (id, saveToLocal = true) => {
 	let partSelect = findElementById(id, list_products[0].spareParts);
 	let gadgetSelect = findElementById(id, list_products[1].gadgets);
 
+	let itemCart = {};
 	if (partSelect) {
 		const { name, img, id } = partSelect;
-		const itemCart = {
+		itemCart = {
 			id: id,
 			name: name,
 			img: img,
 		};
 
-		arrayOfItems.push(itemCart);
-		localStorage.setItem("element_cart", JSON.stringify(arrayOfItems));
-
-		// const divItem = document.createElement("div");
-		// list_item.innerHTML = templateItem(partSelect);
-		// list_item.appendChild(divItem);
 	} else if (gadgetSelect) {
 		const { name, img } = gadgetSelect;
-		const itemCart = {
+		itemCart = {
 			id: id,
 			name: name,
 			img: img,
 		};
-		arrayOfItems.push(itemCart);
-		localStorage.setItem("element_cart", JSON.stringify(arrayOfItems));
 	}
+
+	arrayOfItems.push(itemCart);
+	if (saveToLocal) localStorage.setItem("element_cart", JSON.stringify(arrayOfItems));
+
+	list_item.innerHTML += templateCartItem(itemCart);
+
+	go_to_pay_button.style.visibility = 'visible';
 
 	console.log("esta es la cantidad de items que hay", arrayOfItems.length);
 };
+
+export const removeFromCart = id => {
+	const savedCartItems = localStorage.getItem("element_cart");
+	let arrayOfItems = savedCartItems ? JSON.parse(savedCartItems) : [];
+	const item = document.getElementById(`list_item_${id}`);
+	
+	if (!item) return;
+
+	item.remove();
+	arrayOfItems = arrayOfItems.filter(item => item.id !== id);
+	
+	if (arrayOfItems.length === 0) go_to_pay_button.style.visibility = 'hidden';
+	localStorage.setItem("element_cart", JSON.stringify(arrayOfItems));
+
+}

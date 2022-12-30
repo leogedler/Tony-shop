@@ -161,6 +161,7 @@
 }
 
 .container_list_buttton {
+	visibility: hidden;
 	display: flex;
 	justify-content: center;
 	align-items: center;

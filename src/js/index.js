@@ -10,12 +10,22 @@ import {
 	btn_cart,
 } from "./node.js";
 import { viewCardSpareParts, viewCardGadgets } from "./printCard.js";
-import { viewModal, addingItem } from "./printModal.js";
+import { viewModal, addingItem, removeFromCart } from "./printModal.js";
+
+function preLoadCard(){
+	const savedCartItems = localStorage.getItem("element_cart");
+	const arrayOfItems = savedCartItems ? JSON.parse(savedCartItems) : [];
+	arrayOfItems.forEach(item => {
+		const { id } = item;
+		addingItem(id, false);
+	});
+}
 
 window.addEventListener("DOMContentLoaded", () => {
 	// print cards within grid
 	viewCardSpareParts();
 	viewCardGadgets();
+	preLoadCard();
 });
 
 window.openModal = (id) => {
@@ -29,6 +39,10 @@ window.closeModal = () => {
 window.addCart = (id) => {
 	addingItem(id);
 };
+
+window.removeFromCart = (id) => {
+	removeFromCart(id);
+}
 
 // function for change the style of navbar when the user make scroll
 window.onscroll = function () {
